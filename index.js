@@ -17,7 +17,7 @@ app.get("/", (req, res) => {
   res.send("Puppeteer server is running");
 });
 
-app.get("/liftupp", async (req, res) => {
+app.post("/liftupp", async (req, res) => {
   const username = req.body.username;
   const password = req.body.password;
 
