@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 app.get("/liftupp", async (req, res) => {
   // Launch the browser and open a new blank page
   const browser = await puppeteer.launch({
-    headless: false,
+    headless: "new",
   });
 
   try {
