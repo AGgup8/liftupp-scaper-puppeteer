@@ -29,7 +29,6 @@ app.post("/liftupp", async (req, res) => {
       "--single-process",
       "--no-zygote",
     ],
-    headless: false,
     executablePath: "/usr/bin/google-chrome",
   });
 
