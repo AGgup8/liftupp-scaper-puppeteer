@@ -36,6 +36,7 @@ app.post("/liftupp", async (req, res) => {
   try {
     const page = await browser.newPage();
     await page.goto("https://liftupp.examsoft.co.uk/qmul/");
+    await page.waitForNavigation();
 
     await page.waitForSelector("#username");
     await page.type("#username", username);
