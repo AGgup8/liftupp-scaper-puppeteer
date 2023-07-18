@@ -30,16 +30,17 @@ app.post("/liftupp", async (req, res) => {
       "--no-zygote",
     ],
     headless: "new",
-    executablePath: "/usr/bin/google-chrome"
+    executablePath: "/usr/bin/google-chrome",
   });
 
   try {
     const page = await browser.newPage();
-    await page.goto("https://liftupp.examsoft.co.uk/qmul/");
+    await page.goto("https://liftupp.examsoft.co.uk/qmul/", {
+      timeout: 10000,
+      waitUntil: "load",
+    });
 
-    await page.waitForNavigation();
-    await page.waitForSelector("#username");
-    await page.waitForTimeout(1500);
+    await waitTillHTMLRendered(page);
     await page.type("#username", username);
     await page.type("#password", password);
 
@@ -615,3 +616,42 @@ async function getRemPros(page) {
     ...remProsReviews,
   ];
 }
+
+const waitTillHTMLRendered = async (page, timeout = 30000) => {
+  const checkDurationMsecs = 1000;
+  const maxChecks = timeout / checkDurationMsecs;
+  let lastHTMLSize = 0;
+  let checkCounts = 1;
+  let countStableSizeIterations = 0;
+  const minStableSizeIterations = 3;
+
+  while (checkCounts++ <= maxChecks) {
+    let html = await page.content();
+    let currentHTMLSize = html.length;
+
+    let bodyHTMLSize = await page.evaluate(
+      () => document.body.innerHTML.length
+    );
+
+    console.log(
+      "last: ",
+      lastHTMLSize,
+      " <> curr: ",
+      currentHTMLSize,
+      " body html size: ",
+      bodyHTMLSize
+    );
+
+    if (lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize)
+      countStableSizeIterations++;
+    else countStableSizeIterations = 0; //reset the counter
+
+    if (countStableSizeIterations >= minStableSizeIterations) {
+      console.log("Page rendered fully..");
+      break;
+    }
+
+    lastHTMLSize = currentHTMLSize;
+    await page.waitForTimeout(checkDurationMsecs);
+  }
+};
