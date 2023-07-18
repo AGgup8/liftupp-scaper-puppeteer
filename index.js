@@ -25,7 +25,7 @@ app.get("/liftupp", async (req, res) => {
         "--no-sandbox",
         "--single-process",
         "--no-zygote"
-    ]
+    ],
     headless: "new",
     executablePath:
       process.env.NODE_ENV === "production"
