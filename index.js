@@ -30,10 +30,7 @@ app.get("/liftupp", async (req, res) => {
       "--no-zygote",
     ],
     headless: "new",
-    executablePath:
-      process.env.NODE_ENV === "production"
-        ? "/usr/bin/google-chrome"
-        : puppeteer.executablePath(),
+    executablePath: "/usr/bin/google-chrome"
   });
 
   try {
