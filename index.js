@@ -18,6 +18,9 @@ app.get("/", (req, res) => {
 });
 
 app.get("/liftupp", async (req, res) => {
+  const username = req.body.username;
+  const password = req.body.password;
+
   // Launch the browser and open a new blank page
   const browser = await puppeteer.launch({
     args: [
