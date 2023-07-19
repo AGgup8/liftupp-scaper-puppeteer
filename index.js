@@ -35,11 +35,10 @@ app.post("/liftupp", async (req, res) => {
   try {
     const page = await browser.newPage();
     await page.goto("https://liftupp.examsoft.co.uk/qmul/", {
-      timeout: 10000,
-      waitUntil: "load",
+      timeout: 20000,
+      waitUntil: "networkidle2",
     });
 
-    await waitTillHTMLRendered(page);
     await page.type("#username", username);
     await page.type("#password", password);
 
@@ -52,20 +51,20 @@ app.post("/liftupp", async (req, res) => {
       );
     }
 
-    await page.$eval("a[href='/qmul/portal/feedback/']", (el) => {
-      el.click();
+    await page.goto("https://liftupp.examsoft.co.uk/qmul/portal/feedback", {
+      timeout: 20000,
+      waitUntil: "networkidle2",
     });
-    await page.waitForTimeout(1500);
     await page.$eval("#sliderControls li:last-child a", (el) => {
       el.click();
     });
     await page.waitForSelector("table.feedback");
     await page.click("tr:nth-child(2)");
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(1000);
     await page.click("tr:nth-child(2)");
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(1000);
     await page.click("tr:nth-child(2)");
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(1000);
 
     const supragingivalPmprUltrasonic = await getSupragingivalPmprUltrasonic(
       page
@@ -117,9 +116,9 @@ app.listen(PORT, () => {
 
 async function getSupragingivalPmprUltrasonic(page) {
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -136,9 +135,9 @@ async function getSupragingivalPmprHand(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(4)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -155,9 +154,9 @@ async function getPlaqueAndBleeding(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(3)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -174,9 +173,9 @@ async function getSixPointPocketChart(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(5)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -193,11 +192,11 @@ async function getRsd(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(7)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -214,11 +213,11 @@ async function getDirectRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(3)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -235,11 +234,11 @@ async function getExtractions(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(8)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -257,13 +256,13 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(10)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
 
   // count fits
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const extraCoronalFits = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -298,9 +297,9 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(3)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const extraCoronalImps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -335,9 +334,9 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(4)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const extraCoronalPreps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -372,9 +371,9 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(5)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const extraCoronalTemps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -417,13 +416,13 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(9)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
 
   // count primary impressions
   await page.click("tr:nth-child(2)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const remProsPrimaryImps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -452,9 +451,9 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(7)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const remProsSecondaryImps = await page.$$eval(
     "table.feedback > tr",
     (rows) =>
@@ -485,9 +484,9 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(6)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const remProsJawRegistrations = await page.$$eval(
     "table.feedback > tr",
     (rows) =>
@@ -518,9 +517,9 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(12)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const remProsTryIns = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -549,9 +548,9 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(4)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const remProsFits = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -580,9 +579,9 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   await page.click("tr:nth-child(5)");
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(1000);
   const remProsReviews = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
