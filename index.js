@@ -46,9 +46,7 @@ app.post("/liftupp", async (req, res) => {
 
     const errorMsg = (await page.$("p.error")) || null;
     if (errorMsg) {
-      throw new Error(
-        "Your username or password were incorrect. You are allowed 3 attempts within 5 minutes. After 10 failed attempts accounts are deactivated and your Liftupp administrator will need to re-activate your account."
-      );
+      throw new Error(1);
     }
 
     await page.goto("https://liftupp.examsoft.co.uk/qmul/portal/feedback", {
@@ -103,8 +101,17 @@ app.post("/liftupp", async (req, res) => {
       ],
     });
   } catch (e) {
-    console.error(e);
-    res.send(`Something went wrong whilst running Puppeteer: ${e}`);
+    if (e === 1) {
+      res.json({
+        success: false,
+        message: e,
+      });
+    } else {
+      res.json({
+        success: false,
+        message: "Something went wrong. Please try again or try again later.",
+      });
+    }
   } finally {
     await browser.close();
   }
