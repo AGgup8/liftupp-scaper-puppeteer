@@ -440,13 +440,13 @@ async function getRemPros(page) {
   await page.waitForTimeout(2000);
   const remProsPrimaryImps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
-      const date = el.querySelector("td.date")?.innerHTML ?? "n/a";
-      const time = el.querySelector("td.time")?.innerHTML ?? "n/a";
-      const rating = el.querySelector("td.rating")?.innerHTML ?? "n/a";
-      const patient = el.querySelector("td.patient")?.innerHTML ?? "n/a";
-      const staff = el.querySelector("td.user")?.innerHTML ?? "n/a";
-      const difficulty = el.querySelector("td.difficulty")?.innerHTML ?? "n/a";
-      const procedure = el.querySelector("td.procedure")?.innerHTML ?? "n/a";
+      const date = el.querySelector("td.date").innerHTML;
+      const time = el.querySelector("td.time").innerHTML;
+      const rating = el.querySelector("td.rating").innerHTML;
+      const patient = el.querySelector("td.patient").innerHTML;
+      const staff = el.querySelector("td.user").innerHTML;
+      const difficulty = el.querySelector("td.difficulty").innerHTML;
+      const procedure = el.querySelector("td.procedure").innerHTML;
       const type = "primary impression";
       return {
         date,
@@ -473,14 +473,13 @@ async function getRemPros(page) {
     "table.feedback > tr",
     (rows) =>
       rows.map((el) => {
-        const date = el.querySelector("td.date")?.innerHTML ?? "n/a";
-        const time = el.querySelector("td.time")?.innerHTML ?? "n/a";
-        const rating = el.querySelector("td.rating")?.innerHTML ?? "n/a";
-        const patient = el.querySelector("td.patient")?.innerHTML ?? "n/a";
-        const staff = el.querySelector("td.user")?.innerHTML ?? "n/a";
-        const difficulty =
-          el.querySelector("td.difficulty")?.innerHTML ?? "n/a";
-        const procedure = el.querySelector("td.procedure")?.innerHTML ?? "n/a";
+        const date = el.querySelector("td.date").innerHTML;
+        const time = el.querySelector("td.time").innerHTML;
+        const rating = el.querySelector("td.rating").innerHTML;
+        const patient = el.querySelector("td.patient").innerHTML;
+        const staff = el.querySelector("td.user").innerHTML;
+        const difficulty = el.querySelector("td.difficulty").innerHTML;
+        const procedure = el.querySelector("td.procedure").innerHTML;
         const type = "secondary impression";
         return {
           date,
@@ -507,14 +506,13 @@ async function getRemPros(page) {
     "table.feedback > tr",
     (rows) =>
       rows.map((el) => {
-        const date = el.querySelector("td.date")?.innerHTML ?? "n/a";
-        const time = el.querySelector("td.time")?.innerHTML ?? "n/a";
-        const rating = el.querySelector("td.rating")?.innerHTML ?? "n/a";
-        const patient = el.querySelector("td.patient")?.innerHTML ?? "n/a";
-        const staff = el.querySelector("td.user")?.innerHTML ?? "n/a";
-        const difficulty =
-          el.querySelector("td.difficulty")?.innerHTML ?? "n/a";
-        const procedure = el.querySelector("td.procedure")?.innerHTML ?? "n/a";
+        const date = el.querySelector("td.date").innerHTML;
+        const time = el.querySelector("td.time").innerHTML;
+        const rating = el.querySelector("td.rating").innerHTML;
+        const patient = el.querySelector("td.patient").innerHTML;
+        const staff = el.querySelector("td.user").innerHTML;
+        const difficulty = el.querySelector("td.difficulty").innerHTML;
+        const procedure = el.querySelector("td.procedure").innerHTML;
         const type = "jaw registration";
         return {
           date,
@@ -539,13 +537,13 @@ async function getRemPros(page) {
   await page.waitForTimeout(2000);
   const remProsTryIns = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
-      const date = el.querySelector("td.date")?.innerHTML ?? "n/a";
-      const time = el.querySelector("td.time")?.innerHTML ?? "n/a";
-      const rating = el.querySelector("td.rating")?.innerHTML ?? "n/a";
-      const patient = el.querySelector("td.patient")?.innerHTML ?? "n/a";
-      const staff = el.querySelector("td.user")?.innerHTML ?? "n/a";
-      const difficulty = el.querySelector("td.difficulty")?.innerHTML ?? "n/a";
-      const procedure = el.querySelector("td.procedure")?.innerHTML ?? "n/a";
+      const date = el.querySelector("td.date").innerHTML;
+      const time = el.querySelector("td.time").innerHTML;
+      const rating = el.querySelector("td.rating").innerHTML;
+      const patient = el.querySelector("td.patient").innerHTML;
+      const staff = el.querySelector("td.user").innerHTML;
+      const difficulty = el.querySelector("td.difficulty").innerHTML;
+      const procedure = el.querySelector("td.procedure").innerHTML;
       const type = "try-in";
       return {
         date,
@@ -570,13 +568,13 @@ async function getRemPros(page) {
   await page.waitForTimeout(2000);
   const remProsFits = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
-      const date = el.querySelector("td.date")?.innerHTML ?? "n/a";
-      const time = el.querySelector("td.time")?.innerHTML ?? "n/a";
-      const rating = el.querySelector("td.rating")?.innerHTML ?? "n/a";
-      const patient = el.querySelector("td.patient")?.innerHTML ?? "n/a";
-      const staff = el.querySelector("td.user")?.innerHTML ?? "n/a";
-      const difficulty = el.querySelector("td.difficulty")?.innerHTML ?? "n/a";
-      const procedure = el.querySelector("td.procedure")?.innerHTML ?? "n/a";
+      const date = el.querySelector("td.date").innerHTML;
+      const time = el.querySelector("td.time").innerHTML;
+      const rating = el.querySelector("td.rating").innerHTML;
+      const patient = el.querySelector("td.patient").innerHTML;
+      const staff = el.querySelector("td.user").innerHTML;
+      const difficulty = el.querySelector("td.difficulty").innerHTML;
+      const procedure = el.querySelector("td.procedure").innerHTML;
       const type = "fit";
       return {
         date,
@@ -601,13 +599,13 @@ async function getRemPros(page) {
   await page.waitForTimeout(2000);
   const remProsReviews = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
-      const date = el.querySelector("td.date")?.innerHTML ?? "n/a";
-      const time = el.querySelector("td.time")?.innerHTML ?? "n/a";
-      const rating = el.querySelector("td.rating")?.innerHTML ?? "n/a";
-      const patient = el.querySelector("td.patient")?.innerHTML ?? "n/a";
-      const staff = el.querySelector("td.user")?.innerHTML ?? "n/a";
-      const difficulty = el.querySelector("td.difficulty")?.innerHTML ?? "n/a";
-      const procedure = el.querySelector("td.procedure")?.innerHTML ?? "n/a";
+      const date = el.querySelector("td.date").innerHTML;
+      const time = el.querySelector("td.time").innerHTML;
+      const rating = el.querySelector("td.rating").innerHTML;
+      const patient = el.querySelector("td.patient").innerHTML;
+      const staff = el.querySelector("td.user").innerHTML;
+      const difficulty = el.querySelector("td.difficulty").innerHTML;
+      const procedure = el.querySelector("td.procedure").innerHTML;
       const type = "review";
       return {
         date,
@@ -631,3 +629,42 @@ async function getRemPros(page) {
     ...remProsReviews,
   ];
 }
+
+const waitTillHTMLRendered = async (page, timeout = 30000) => {
+  const checkDurationMsecs = 1000;
+  const maxChecks = timeout / checkDurationMsecs;
+  let lastHTMLSize = 0;
+  let checkCounts = 1;
+  let countStableSizeIterations = 0;
+  const minStableSizeIterations = 3;
+
+  while (checkCounts++ <= maxChecks) {
+    let html = await page.content();
+    let currentHTMLSize = html.length;
+
+    let bodyHTMLSize = await page.evaluate(
+      () => document.body.innerHTML.length
+    );
+
+    console.log(
+      "last: ",
+      lastHTMLSize,
+      " <> curr: ",
+      currentHTMLSize,
+      " body html size: ",
+      bodyHTMLSize
+    );
+
+    if (lastHTMLSize != 0 && currentHTMLSize == lastHTMLSize)
+      countStableSizeIterations++;
+    else countStableSizeIterations = 0; //reset the counter
+
+    if (countStableSizeIterations >= minStableSizeIterations) {
+      console.log("Page rendered fully..");
+      break;
+    }
+
+    lastHTMLSize = currentHTMLSize;
+    await page.waitForTimeout(checkDurationMsecs);
+  }
+};
