@@ -61,20 +61,20 @@ app.post("/liftupp", async (req, res) => {
     await page.$eval("#sliderControls li:last-child a", (el) => {
       el.click();
     });
-    await new Promise((r) => setTimeout(r, 1700));
+    await new Promise((r) => setTimeout(r, 2000));
     await page.waitForSelector("table.feedback");
     await page.$eval("tr:nth-child(2)", (el) => {
       el.click();
     });
-    await new Promise((r) => setTimeout(r, 1700));
+    await new Promise((r) => setTimeout(r, 2000));
     await page.$eval("tr:nth-child(2)", (el) => {
       el.click();
     });
-    await new Promise((r) => setTimeout(r, 1700));
+    await new Promise((r) => setTimeout(r, 2000));
 
     const [perioRow] = await page.$x('//td[contains(text(), "Perio")]/..');
     await perioRow.click();
-    await new Promise((r) => setTimeout(r, 1700));
+    await new Promise((r) => setTimeout(r, 2000));
 
     const supragingivalPmprUltrasonic = await getSupragingivalPmprUltrasonic(
       page
@@ -156,13 +156,13 @@ async function getSupragingivalPmprHand(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [handPmprRow] = await page.$x(
     '//td[contains(text(), "Supra Gingival Debridement (Hand)")]/..'
   );
   await handPmprRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -180,13 +180,13 @@ async function getPlaqueAndBleeding(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [plaqueAndBleedingRow] = await page.$x(
     '//td[contains(text(), "Plaque and Bleeding Index")]/..'
   );
   await plaqueAndBleedingRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -204,13 +204,13 @@ async function getSixPointPocketChart(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [sixPointRow] = await page.$x(
     '//td[contains(text(), "Comprehensive Periodontal Assessment (Loss of Attachment)")]/..'
   );
   await sixPointRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -228,15 +228,15 @@ async function getRsd(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [rsdRow] = await page.$x('//td[contains(text(), "RSD")]/..');
   await rsdRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [rsdRowTwo] = await page.$x('//td[contains(text(), "RSD")]/..');
   await rsdRowTwo.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -254,19 +254,19 @@ async function getDirectRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [restorationsRow] = await page.$x(
     '//td[contains(text(), "Direct Restorations")]/..'
   );
   await restorationsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [contourRow] = await page.$x(
     '//td[contains(text(), "Appropriate restoration of tooth contour and anatomy")]/..'
   );
   await contourRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -284,17 +284,17 @@ async function getExtractions(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [xlaRow] = await page.$x('//td[contains(text(), "Extractions")]/..');
   await xlaRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [toothMovementRow] = await page.$x(
     '//td[contains(text(), "Appropriate Tooth Movement")]/..'
   );
   await toothMovementRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   await page.click("tr:nth-child(2)");
   await new Promise((r) => setTimeout(r, 2000));
@@ -315,20 +315,20 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [extraCoronalRow] = await page.$x(
     '//td[contains(text(), "Indirect Restorations")]/..'
   );
   await extraCoronalRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   // count fits
   const [fitsRow] = await page.$x(
     '//td[contains(text(), "Fit of Indirect restoration")]/..'
   );
   await fitsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const extraCoronalFits = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -363,13 +363,13 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [impsRow] = await page.$x(
     '//td[contains(text(), "Impression taking")]/..'
   );
   await impsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const extraCoronalImps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -404,13 +404,13 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [prepsRow] = await page.$x(
     '//td[contains(text(), "Appropriate Tooth Reduction")]/..'
   );
   await prepsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const extraCoronalPreps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -445,13 +445,13 @@ async function getExtraCoronalRestorations(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [tempsRow] = await page.$x(
     '//td[contains(text(), "Construction and fit of provisional restoration")]/..'
   );
   await tempsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const extraCoronalTemps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -495,17 +495,17 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
   const [element] = await page.$x('//td[contains(text(), "Pros")]/..');
   await element.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   // count primary impressions
   const [primaryImpRow] = await page.$x(
     '//td[contains(text(), "Impression taking (1st imps)")]/..'
   );
   await primaryImpRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const remProsPrimaryImps = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -534,13 +534,13 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [secondaryImpRow] = await page.$x(
     '//td[contains(text(), "Impression taking (2nd imps)")]/..'
   );
   await secondaryImpRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const remProsSecondaryImps = await page.$$eval(
     "table.feedback > tr",
@@ -571,13 +571,13 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [jawRegRow] = await page.$x(
     '//td[contains(text(), "Ability to perform a Registration")]/..'
   );
   await jawRegRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const remProsJawRegistrations = await page.$$eval(
     "table.feedback > tr",
@@ -608,11 +608,11 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [tryinRow] = await page.$x('//td[contains(text(), "Try in teeth")]/..');
   await tryinRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const remProsTryIns = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
@@ -641,11 +641,11 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [fitsRow] = await page.$x('//td[. = "Fit"]');
   await fitsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
   const remProsFits = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
@@ -673,13 +673,13 @@ async function getRemPros(page) {
   await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
     el.click();
   });
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
 
   const [reviewsRow] = await page.$x(
     '//td[contains(text(), "Management complications at Review")]/..'
   );
   await reviewsRow.click();
-  await new Promise((r) => setTimeout(r, 1700));
+  await new Promise((r) => setTimeout(r, 2000));
   const remProsReviews = await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
