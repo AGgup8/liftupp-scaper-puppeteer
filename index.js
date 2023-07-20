@@ -110,7 +110,7 @@ app.post("/liftupp", async (req, res) => {
     });
   } catch (e) {
     console.error(e);
-    if (e.message === 1) {
+    if (e.message == 1) {
       res.json({
         success: false,
         message:
