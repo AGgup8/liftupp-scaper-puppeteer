@@ -643,7 +643,7 @@ async function getRemPros(page) {
   });
   await new Promise((r) => setTimeout(r, 1700));
 
-  const [fitsRow] = await page.$x('//td[text()="Fit")]/..');
+  const [fitsRow] = await page.$x('//td[. = "Fit"]');
   await fitsRow.click();
   await new Promise((r) => setTimeout(r, 1700));
   const remProsFits = await page.$$eval("table.feedback > tr", (rows) =>
