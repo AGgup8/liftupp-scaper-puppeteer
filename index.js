@@ -35,7 +35,7 @@ app.post("/liftupp", async (req, res) => {
   try {
     const page = await browser.newPage();
     await page.goto("https://liftupp.examsoft.co.uk/qmul/", {
-      timeout: 20000,
+      timeout: 30000,
       waitUntil: "networkidle2",
     });
 
@@ -55,7 +55,7 @@ app.post("/liftupp", async (req, res) => {
     }
 
     await page.goto("https://liftupp.examsoft.co.uk/qmul/portal/feedback", {
-      timeout: 20000,
+      timeout: 30000,
       waitUntil: "networkidle2",
     });
     await page.$eval("#sliderControls li:last-child a", (el) => {
