@@ -115,13 +115,12 @@ app.post("/liftupp", async (req, res) => {
     if (e.message == 1) {
       res.json({
         success: false,
-        message:
-          "Your username or password were incorrect. You are allowed 3 attempts within 5 minutes. After 10 failed attempts accounts are deactivated and your Liftupp administrator will need to re-activate your account.",
+        errorCode: 1,
       });
     } else {
       res.json({
         success: false,
-        message: "Something went wrong. Please try again or try again later.",
+        errorCode: 2,
       });
     }
   } finally {
