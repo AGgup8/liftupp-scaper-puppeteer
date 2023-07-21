@@ -63,16 +63,22 @@ app.post("/liftupp", async (req, res) => {
     });
     await new Promise((r) => setTimeout(r, 2000));
     await page.waitForSelector("table.feedback");
-    await page.$eval("tr:nth-child(2)", (el) => {
-      el.click();
-    });
-    await new Promise((r) => setTimeout(r, 2000));
-    await page.$eval("tr:nth-child(2)", (el) => {
-      el.click();
-    });
+
+    const [clinicalSkillsRow] = await page.$x(
+      '//td[contains(text(), "Clinical Skills")]/..'
+    );
+    await clinicalSkillsRow.click();
     await new Promise((r) => setTimeout(r, 2000));
 
-    const [perioRow] = await page.$x('//td[contains(text(), "Perio")]/..');
+    const [adultDentistryRow] = await page.$x(
+      '//td[contains(text(), "Adult Dentistry")]/..'
+    );
+    await adultDentistryRow.click();
+    await new Promise((r) => setTimeout(r, 2000));
+
+    const [perioRow] = await page.$x(
+      '//td[contains(text(), "Periodontics")]/..'
+    );
     await perioRow.click();
     await new Promise((r) => setTimeout(r, 2000));
 
@@ -295,8 +301,6 @@ async function getExtractions(page) {
   await toothMovementRow.click();
   await new Promise((r) => setTimeout(r, 2000));
 
-  await page.click("tr:nth-child(2)");
-  await new Promise((r) => setTimeout(r, 2000));
   return await page.$$eval("table.feedback > tr", (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
