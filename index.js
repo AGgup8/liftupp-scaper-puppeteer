@@ -34,13 +34,29 @@ app.post("/liftupp", async (req, res) => {
 
   try {
     const page = await browser.newPage();
+    page.on("load", () => {
+      const content = `
+      *,
+      *::after,
+      *::before {
+          transition-delay: 0s !important;
+          transition-duration: 0s !important;
+          animation-delay: -0.0001s !important;
+          animation-duration: 0s !important;
+          animation-play-state: paused !important;
+          caret-color: transparent !important;
+      }`;
+  
+      page.addStyleTag({ content });
+    });
     await page.goto("https://liftupp.examsoft.co.uk/qmul/", {
-      timeout: 30000,
+      timeout: 20000,
       waitUntil: "networkidle2",
     });
 
     await page.type("#username", username);
     await page.type("#password", password);
+
 
     await Promise.all([
       page.click("#loginButton"),
@@ -55,32 +71,37 @@ app.post("/liftupp", async (req, res) => {
     }
 
     await page.goto("https://liftupp.examsoft.co.uk/qmul/portal/feedback", {
-      timeout: 30000,
+      timeout: 20000,
       waitUntil: "networkidle2",
     });
-    await page.$eval("#sliderControls li:last-child a", (el) => {
-      el.click();
-    });
-    await new Promise((r) => setTimeout(r, 2000));
-    await page.waitForSelector("table.feedback");
 
-    const [clinicalSkillsRow] = await page.$x(
-      '//td[contains(text(), "Clinical Skills")]/..'
+    const [breadcrumb] = await getElementByX(
+      "//*[@id='sliderControls']/li[last()]/a",
+      page
     );
-    await clinicalSkillsRow.click();
-    await new Promise((r) => setTimeout(r, 2000));
+    await click(breadcrumb);
+    await new Promise((r) => setTimeout(r, 1500));
 
-    const [adultDentistryRow] = await page.$x(
-      '//td[contains(text(), "Adult Dentistry")]/..'
+    const [clinicalRow] = await getElementByX(
+      '//td[contains(text(), "Clinical Skills")]/..',
+      page
     );
-    await adultDentistryRow.click();
-    await new Promise((r) => setTimeout(r, 2000));
+    await click(clinicalRow);
+    await new Promise((r) => setTimeout(r, 1500));
 
-    const [perioRow] = await page.$x(
-      '//td[contains(text(), "Periodontics")]/..'
+    const [adultRow] = await getElementByX(
+      '//td[contains(text(), "Adult Dentistry")]/..',
+      page
     );
-    await perioRow.click();
-    await new Promise((r) => setTimeout(r, 2000));
+    await click(adultRow);
+    await new Promise((r) => setTimeout(r, 1500));
+
+    const [perioRow] = await getElementByX(
+      '//td[contains(text(), "Periodontics")]/..',
+      page
+    );
+    click(perioRow);
+    await new Promise((r) => setTimeout(r, 300));
 
     const supragingivalPmprUltrasonic = await getSupragingivalPmprUltrasonic(
       page
@@ -138,14 +159,66 @@ app.listen(PORT, () => {
   console.log(`Server has started on port ${PORT}.`);
 });
 
-async function getSupragingivalPmprUltrasonic(page) {
-  const [ultrasonicPmprRow] = await page.$x(
-    '//td[contains(text(), "Supra Gingival Debridement (Ultrasonic)")]/..'
-  );
-  await ultrasonicPmprRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+async function click(element) {
+  try {
+    console.log("clicking element");
+    await element.click();
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+    // repeat the click after 300ms incase it didn't work
+    await new Promise((r) => setTimeout(r, 300));
+    try {
+      await element.click();
+    } catch (error) {
+      console.log('extra click not needed')
+    }
+  } catch (error) {
+    console.log("failed clicking element so trying again");
+    await new Promise((r) => setTimeout(r, 1500));
+    await element.click();
+  }
+}
+
+async function getElementByX(selector, page) {
+  try {
+    console.log("evaluating element by x");
+    const element = await page.$x(selector);
+    if (element.constructor === Array && element.length === 0) {
+      throw new Error("element not found by x");
+    }
+    return element;
+  } catch (error) {
+    console.log("evaluation by x failed so trying again");
+    await new Promise((r) => setTimeout(r, 1500));
+    const element = await page.$x(selector);
+    if (element.constructor === Array && element.length === 0) {
+      throw new Error("element not found by x");
+    }
+    return element;
+  }
+}
+
+async function evaluateTable(tableSelector, page, callback) {
+  try {
+    console.log("evaluating table");
+    const table = await page.$$eval(tableSelector, callback);
+    return table;
+  } catch (error) {
+    console.log("evaluation failed so trying again");
+    await new Promise((r) => setTimeout(r, 1500));
+    const table = await page.$$eval(tableSelector, callback);
+    return table;
+  }
+}
+
+async function getSupragingivalPmprUltrasonic(page) {
+  const [ultrasonicPmprRow] = await getElementByX(
+    '//td[contains(text(), "Supra Gingival Debridement (Ultrasonic)")]/..',
+    page
+  );
+  await click(ultrasonicPmprRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  return evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -158,18 +231,22 @@ async function getSupragingivalPmprUltrasonic(page) {
 }
 
 async function getSupragingivalPmprHand(page) {
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
-
-  const [handPmprRow] = await page.$x(
-    '//td[contains(text(), "Supra Gingival Debridement (Hand)")]/..'
+  await new Promise((r) => setTimeout(r, 300));
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await handPmprRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+  const [handPmprRow] = await getElementByX(
+    '//td[contains(text(), "Supra Gingival Debridement (Hand)")]/..',
+    page
+  );
+  await click(handPmprRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -182,18 +259,22 @@ async function getSupragingivalPmprHand(page) {
 }
 
 async function getPlaqueAndBleeding(page) {
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
-
-  const [plaqueAndBleedingRow] = await page.$x(
-    '//td[contains(text(), "Plaque and Bleeding Index")]/..'
+  await new Promise((r) => setTimeout(r, 300));
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await plaqueAndBleedingRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+  const [plaqueAndBleedingRow] = await getElementByX(
+    '//td[contains(text(), "Plaque and Bleeding Index")]/..',
+    page
+  );
+  await click(plaqueAndBleedingRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -206,18 +287,22 @@ async function getPlaqueAndBleeding(page) {
 }
 
 async function getSixPointPocketChart(page) {
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
-
-  const [sixPointRow] = await page.$x(
-    '//td[contains(text(), "Comprehensive Periodontal Assessment (Loss of Attachment)")]/..'
+  await new Promise((r) => setTimeout(r, 300));
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await sixPointRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+  const [sixPointRow] = await getElementByX(
+    '//td[contains(text(), "Comprehensive Periodontal Assessment (Loss of Attachment)")]/..',
+    page
+  );
+  await click(sixPointRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -230,20 +315,29 @@ async function getSixPointPocketChart(page) {
 }
 
 async function getRsd(page) {
-  await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[5]",
+    page
+  );
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [rsdRow] = await page.$x('//td[contains(text(), "RSD")]/..');
-  await rsdRow.click();
-  await new Promise((r) => setTimeout(r, 2000));
+  const [rsdRow] = await getElementByX(
+    '//td[contains(text(), "RSD")]/..',
+    page
+  );
+  await click(rsdRow);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [rsdRowTwo] = await page.$x('//td[contains(text(), "RSD")]/..');
-  await rsdRowTwo.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  const [rsdRowTwo] = await getElementByX(
+    '//td[contains(text(), "RSD")]/..',
+    page
+  );
+  await click(rsdRowTwo);
+  await new Promise((r) => setTimeout(r, 500));
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+  return await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -256,24 +350,29 @@ async function getRsd(page) {
 }
 
 async function getDirectRestorations(page) {
-  await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
-
-  const [restorationsRow] = await page.$x(
-    '//td[contains(text(), "Direct Restorations")]/..'
+  await new Promise((r) => setTimeout(r, 300));
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[5]",
+    page
   );
-  await restorationsRow.click();
-  await new Promise((r) => setTimeout(r, 2000));
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [contourRow] = await page.$x(
-    '//td[contains(text(), "Appropriate restoration of tooth contour and anatomy")]/..'
+  const [restorationsRow] = await getElementByX(
+    '//td[contains(text(), "Direct Restorations")]/..',
+    page
   );
-  await contourRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(restorationsRow);
+  await new Promise((r) => setTimeout(r, 300));
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+  const [contourRow] = await getElementByX(
+    '//td[contains(text(), "Appropriate restoration of tooth contour and anatomy")]/..',
+    page
+  );
+  await click(contourRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -286,22 +385,30 @@ async function getDirectRestorations(page) {
 }
 
 async function getExtractions(page) {
-  await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [xlaRow] = await page.$x('//td[contains(text(), "Extractions")]/..');
-  await xlaRow.click();
-  await new Promise((r) => setTimeout(r, 2000));
-
-  const [toothMovementRow] = await page.$x(
-    '//td[contains(text(), "Appropriate Tooth Movement")]/..'
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[5]",
+    page
   );
-  await toothMovementRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  return await page.$$eval("table.feedback > tr", (rows) =>
+  const [xlaRow] = await getElementByX(
+    '//td[contains(text(), "Extractions")]/..',
+    page
+  );
+  await click(xlaRow);
+  await new Promise((r) => setTimeout(r, 300));
+
+  const [toothMovementRow] = await getElementByX(
+    '//td[contains(text(), "Appropriate Tooth Movement")]/..',
+    page
+  );
+  await click(toothMovementRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  return await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -314,26 +421,31 @@ async function getExtractions(page) {
 }
 
 async function getExtraCoronalRestorations(page) {
-  // naivagate to extra-coronal restorations
-  await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [extraCoronalRow] = await page.$x(
-    '//td[contains(text(), "Indirect Restorations")]/..'
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[5]",
+    page
   );
-  await extraCoronalRow.click();
-  await new Promise((r) => setTimeout(r, 2000));
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
+
+  const [extraCoronalRow] = await getElementByX(
+    '//td[contains(text(), "Indirect Restorations")]/..',
+    page
+  );
+  await click(extraCoronalRow);
+  await new Promise((r) => setTimeout(r, 300));
 
   // count fits
-  const [fitsRow] = await page.$x(
-    '//td[contains(text(), "Fit of Indirect restoration")]/..'
+  const [fitsRow] = await getElementByX(
+    '//td[contains(text(), "Fit of Indirect restoration")]/..',
+    page
   );
-  await fitsRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(fitsRow);
+  await new Promise((r) => setTimeout(r, 500));
 
-  const extraCoronalFits = await page.$$eval("table.feedback > tr", (rows) =>
+  const extraCoronalFits = await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -363,18 +475,23 @@ async function getExtraCoronalRestorations(page) {
   );
 
   // count impressions
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [impsRow] = await page.$x(
-    '//td[contains(text(), "Impression taking")]/..'
+  const [indirectBreadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await impsRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(indirectBreadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const extraCoronalImps = await page.$$eval("table.feedback > tr", (rows) =>
+  const [impsRow] = await getElementByX(
+    '//td[contains(text(), "Impression taking")]/..',
+    page
+  );
+  await click(impsRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const extraCoronalImps = await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -404,18 +521,23 @@ async function getExtraCoronalRestorations(page) {
   );
 
   // count preps
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [prepsRow] = await page.$x(
-    '//td[contains(text(), "Appropriate Tooth Reduction")]/..'
+  const [indirectBreadcrumbTwo] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await prepsRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(indirectBreadcrumbTwo);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const extraCoronalPreps = await page.$$eval("table.feedback > tr", (rows) =>
+  const [prepsRow] = await getElementByX(
+    '//td[contains(text(), "Appropriate Tooth Reduction")]/..',
+    page
+  );
+  await click(prepsRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const extraCoronalPreps = await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -445,46 +567,54 @@ async function getExtraCoronalRestorations(page) {
   );
 
   // count temps
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [tempsRow] = await page.$x(
-    '//td[contains(text(), "Construction and fit of provisional restoration")]/..'
+  const [indirectBreadcrumbThree] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await tempsRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(indirectBreadcrumbThree);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const extraCoronalTemps = await page.$$eval("table.feedback > tr", (rows) =>
-    rows.map((el) => {
-      const date = el.querySelector("td.date").innerHTML;
-      const time = el.querySelector("td.time").innerHTML;
-      const rating = el.querySelector("td.rating").innerHTML;
-      const patient = el.querySelector("td.patient").innerHTML;
-      const quad = el.querySelector("td.quad").innerHTML;
-      const tooth = el.querySelector("td.tooth").innerHTML;
-      const staff = el.querySelector("td.user").innerHTML;
-      const difficulty = el.querySelector("td.difficulty").innerHTML;
-      const procedure = el.querySelector("td.procedure").innerHTML;
-      const material = el.querySelector("td.material").innerHTML;
-      const type = "temporary";
-      return {
-        date,
-        time,
-        rating,
-        patient,
-        quad,
-        tooth,
-        staff,
-        difficulty,
-        procedure,
-        material,
-        type,
-      };
-    })
+  const [tempsRow] = await getElementByX(
+    '//td[contains(text(), "Construction and fit of provisional restoration")]/..',
+    page
   );
+  await click(tempsRow);
+  await new Promise((r) => setTimeout(r, 500));
 
+  const extraCoronalTemps = await evaluateTable(
+    "table.feedback > tr",
+    page,
+    (rows) =>
+      rows.map((el) => {
+        const date = el.querySelector("td.date").innerHTML;
+        const time = el.querySelector("td.time").innerHTML;
+        const rating = el.querySelector("td.rating").innerHTML;
+        const patient = el.querySelector("td.patient").innerHTML;
+        const quad = el.querySelector("td.quad").innerHTML;
+        const tooth = el.querySelector("td.tooth").innerHTML;
+        const staff = el.querySelector("td.user").innerHTML;
+        const difficulty = el.querySelector("td.difficulty").innerHTML;
+        const procedure = el.querySelector("td.procedure").innerHTML;
+        const material = el.querySelector("td.material").innerHTML;
+        const type = "temporary";
+        return {
+          date,
+          time,
+          rating,
+          patient,
+          quad,
+          tooth,
+          staff,
+          difficulty,
+          procedure,
+          material,
+          type,
+        };
+      })
+  );
+  
   return [
     ...extraCoronalPreps,
     ...extraCoronalImps,
@@ -494,59 +624,76 @@ async function getExtraCoronalRestorations(page) {
 }
 
 async function getRemPros(page) {
-  // navigate to removable pros
-  await page.$eval("ul.breadcrumb > li:nth-child(5)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
-  const [element] = await page.$x('//td[contains(text(), "Pros")]/..');
-  await element.click();
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
+
+  const [breadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[5]",
+    page
+  );
+  await click(breadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
+
+  const [prosRow] = await getElementByX(
+    '//td[contains(text(), "Pros")]/..',
+    page
+  );
+  await click(prosRow);
+  await new Promise((r) => setTimeout(r, 300));
 
   // count primary impressions
-  const [primaryImpRow] = await page.$x(
-    '//td[contains(text(), "Impression taking (1st imps)")]/..'
+  const [primaryImpRow] = await getElementByX(
+    '//td[contains(text(), "Impression taking (1st imps)")]/..',
+    page
   );
-  await primaryImpRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(primaryImpRow);
+  await new Promise((r) => setTimeout(r, 500));
 
-  const remProsPrimaryImps = await page.$$eval("table.feedback > tr", (rows) =>
-    rows.map((el) => {
-      const date = el.querySelector("td.date").innerHTML;
-      const time = el.querySelector("td.time").innerHTML;
-      const rating = el.querySelector("td.rating").innerHTML;
-      const patient = el.querySelector("td.patient").innerHTML;
-      const staff = el.querySelector("td.user").innerHTML;
-      const difficulty = el.querySelector("td.difficulty").innerHTML;
-      const procedure = el.querySelector("td.procedure").innerHTML;
-      const type = "primary impression";
-      return {
-        date,
-        time,
-        rating,
-        staff,
-        patient,
-        difficulty,
-        procedure,
-        type,
-      };
-    })
+  const remProsPrimaryImps = await evaluateTable(
+    "table.feedback > tr",
+    page,
+    (rows) =>
+      rows.map((el) => {
+        const date = el.querySelector("td.date").innerHTML;
+        const time = el.querySelector("td.time").innerHTML;
+        const rating = el.querySelector("td.rating").innerHTML;
+        const patient = el.querySelector("td.patient").innerHTML;
+        const staff = el.querySelector("td.user").innerHTML;
+        const difficulty = el.querySelector("td.difficulty").innerHTML;
+        const procedure = el.querySelector("td.procedure").innerHTML;
+        const type = "primary impression";
+        return {
+          date,
+          time,
+          rating,
+          staff,
+          patient,
+          difficulty,
+          procedure,
+          type,
+        };
+      })
   );
 
   // count secondary impressions
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [secondaryImpRow] = await page.$x(
-    '//td[contains(text(), "Impression taking (2nd imps)")]/..'
+  const [remProsBreadcrumb] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await secondaryImpRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(remProsBreadcrumb);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const remProsSecondaryImps = await page.$$eval(
+  const [secondaryImpRow] = await getElementByX(
+    '//td[contains(text(), "Impression taking (2nd imps)")]/..',
+    page
+  );
+  await click(secondaryImpRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const remProsSecondaryImps = await evaluateTable(
     "table.feedback > tr",
+    page,
     (rows) =>
       rows.map((el) => {
         const date = el.querySelector("td.date").innerHTML;
@@ -571,19 +718,25 @@ async function getRemPros(page) {
   );
 
   // count jaw registrations
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [jawRegRow] = await page.$x(
-    '//td[contains(text(), "Ability to perform a Registration")]/..'
+  const [remProsBreadcrumbTwo] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await jawRegRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  await click(remProsBreadcrumbTwo);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const remProsJawRegistrations = await page.$$eval(
+  const [jawRegRow] = await getElementByX(
+    '//td[contains(text(), "Ability to perform a Registration")]/..',
+    page
+  );
+  await click(jawRegRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const remProsJawRegistrations = await evaluateTable(
     "table.feedback > tr",
+    page,
     (rows) =>
       rows.map((el) => {
         const date = el.querySelector("td.date").innerHTML;
@@ -608,48 +761,63 @@ async function getRemPros(page) {
   );
 
   // count try-ins
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [tryinRow] = await page.$x('//td[contains(text(), "Try in teeth")]/..');
-  await tryinRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
+  const [remProsBreadcrumbThree] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
+  );
+  await click(remProsBreadcrumbThree);
+  await new Promise((r) => setTimeout(r, 300));
 
-  const remProsTryIns = await page.$$eval("table.feedback > tr", (rows) =>
-    rows.map((el) => {
-      const date = el.querySelector("td.date").innerHTML;
-      const time = el.querySelector("td.time").innerHTML;
-      const rating = el.querySelector("td.rating").innerHTML;
-      const patient = el.querySelector("td.patient").innerHTML;
-      const staff = el.querySelector("td.user").innerHTML;
-      const difficulty = el.querySelector("td.difficulty").innerHTML;
-      const procedure = el.querySelector("td.procedure").innerHTML;
-      const type = "try-in";
-      return {
-        date,
-        time,
-        rating,
-        staff,
-        patient,
-        difficulty,
-        procedure,
-        type,
-      };
-    })
+  const [tryinRow] = await getElementByX(
+    '//td[contains(text(), "Try in teeth")]/..',
+    page
+  );
+  await click(tryinRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const remProsTryIns = await evaluateTable(
+    "table.feedback > tr",
+    page,
+    (rows) =>
+      rows.map((el) => {
+        const date = el.querySelector("td.date").innerHTML;
+        const time = el.querySelector("td.time").innerHTML;
+        const rating = el.querySelector("td.rating").innerHTML;
+        const patient = el.querySelector("td.patient").innerHTML;
+        const staff = el.querySelector("td.user").innerHTML;
+        const difficulty = el.querySelector("td.difficulty").innerHTML;
+        const procedure = el.querySelector("td.procedure").innerHTML;
+        const type = "try-in";
+        return {
+          date,
+          time,
+          rating,
+          staff,
+          patient,
+          difficulty,
+          procedure,
+          type,
+        };
+      })
   );
 
   // count fits
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [fitsRow] = await page.$x('//td[. = "Fit"]');
-  await fitsRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
-  const remProsFits = await page.$$eval("table.feedback > tr", (rows) =>
+  const [remProsBreadcrumbFour] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
+  );
+  await click(remProsBreadcrumbFour);
+  await new Promise((r) => setTimeout(r, 300));
+
+  const [fitsRow] = await getElementByX('//td[. = "Fit"]', page);
+  await click(fitsRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const remProsFits = await evaluateTable("table.feedback > tr", page, (rows) =>
     rows.map((el) => {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
@@ -673,37 +841,46 @@ async function getRemPros(page) {
   );
 
   // count reviews
-  await page.$eval("ul.breadcrumb > li:nth-child(7)", (el) => {
-    el.click();
-  });
-  await new Promise((r) => setTimeout(r, 2000));
+  await new Promise((r) => setTimeout(r, 300));
 
-  const [reviewsRow] = await page.$x(
-    '//td[contains(text(), "Management complications at Review")]/..'
+  const [remProsBreadcrumbFive] = await getElementByX(
+    "//ul[@class='breadcrumb']/li[7]",
+    page
   );
-  await reviewsRow.click();
-  await new Promise((r) => setTimeout(r, 3000));
-  const remProsReviews = await page.$$eval("table.feedback > tr", (rows) =>
-    rows.map((el) => {
-      const date = el.querySelector("td.date").innerHTML;
-      const time = el.querySelector("td.time").innerHTML;
-      const rating = el.querySelector("td.rating").innerHTML;
-      const patient = el.querySelector("td.patient").innerHTML;
-      const staff = el.querySelector("td.user").innerHTML;
-      const difficulty = el.querySelector("td.difficulty").innerHTML;
-      const procedure = el.querySelector("td.procedure").innerHTML;
-      const type = "review";
-      return {
-        date,
-        time,
-        rating,
-        staff,
-        patient,
-        difficulty,
-        procedure,
-        type,
-      };
-    })
+  await click(remProsBreadcrumbFive);
+  await new Promise((r) => setTimeout(r, 300));
+
+  const [reviewsRow] = await getElementByX(
+    '//td[contains(text(), "Management complications at Review")]/..',
+    page
+  );
+  await click(reviewsRow);
+  await new Promise((r) => setTimeout(r, 500));
+
+  const remProsReviews = await evaluateTable(
+    "table.feedback > tr",
+    page,
+    (rows) =>
+      rows.map((el) => {
+        const date = el.querySelector("td.date").innerHTML;
+        const time = el.querySelector("td.time").innerHTML;
+        const rating = el.querySelector("td.rating").innerHTML;
+        const patient = el.querySelector("td.patient").innerHTML;
+        const staff = el.querySelector("td.user").innerHTML;
+        const difficulty = el.querySelector("td.difficulty").innerHTML;
+        const procedure = el.querySelector("td.procedure").innerHTML;
+        const type = "review";
+        return {
+          date,
+          time,
+          rating,
+          staff,
+          patient,
+          difficulty,
+          procedure,
+          type,
+        };
+      })
   );
 
   return [
