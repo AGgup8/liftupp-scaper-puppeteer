@@ -377,9 +377,14 @@ async function getDirectRestorations(page) {
       const date = el.querySelector("td.date").innerHTML;
       const time = el.querySelector("td.time").innerHTML;
       const rating = el.querySelector("td.rating").innerHTML;
+      const clinic = el.querySelector("td.clinic").innerHTML;
       const staff = el.querySelector("td.user").innerHTML;
+      const quad = el.querySelector("td.quad").innerHTML;
+      const tooth = el.querySelector("td.tooth").innerHTML;
       const difficulty = el.querySelector("td.difficulty").innerHTML;
-      return { date, time, rating, staff, difficulty };
+      const procedure = el.querySelector("td.procedure").innerHTML;
+      const material = el.querySelector("td.material").innerHTML;
+      return { date, time, rating, clinic, staff, quad, tooth, difficulty, procedure, material };
     })
   );
 }
